@@ -430,8 +430,10 @@ namespace carma {
         py::capsule base = create_capsule(data);
 
         return py::array_t<T>(
-            {nslices, nrows, ncols}, // shape
-            {tsize * nrows * ncols, tsize, nrows * tsize}, // F-style contiguous strides
+            //{nslices, nrows, ncols}, // shape
+            //{tsize * nrows * ncols, tsize, nrows * tsize}, // F-style contiguous strides
+	    {nrows, ncols, nslices}, // shape
+            {nrows * tsize, tsize, tsize * nrows * ncols}, // F-style contiguous strides
             data, // the data pointer
             base // numpy array references this parent
         );
