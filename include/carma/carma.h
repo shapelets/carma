@@ -421,6 +421,7 @@ namespace carma {
     /* ######################################## Cube ######################################## */
      template <typename T> inline py::array_t<T> _cube_to_arr(arma::Cube<T> * src, bool copy) {
         /* Convert armadillo matrix to numpy array */
+        ssize_t tsize =  static_cast<ssize_t>(sizeof(T));
         ssize_t nrows = static_cast<ssize_t>(src->n_rows);
         ssize_t ncols = static_cast<ssize_t>(src->n_cols);
         ssize_t nslices = static_cast<ssize_t>(src->n_slices);
@@ -430,6 +431,7 @@ namespace carma {
         // second section of template specifies that we want a c_style array and pybind should copy if not
         return py::array_t<T,  py::array::c_style | py::array::forcecast>(
             {nrows, ncols, nslices}, // shape
+            {tsize * nrows, tsize, tsize * nrows * ncols},
             data // the data pointer
         );
     } /* _cube_to_arr */
