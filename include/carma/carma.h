@@ -431,7 +431,7 @@ namespace carma {
         // second section of template specifies that we want a c_style array and pybind should copy if not
         return py::array_t<T,  py::array::c_style | py::array::forcecast>(
             {nrows, ncols, nslices}, // shape
-            {tsize * nrows, tsize, tsize * nrows * ncols},
+            {tsize, tsize * ncols, tsize * nrows * ncols},
             data // the data pointer
         );
     } /* _cube_to_arr */
