@@ -419,21 +419,20 @@ namespace carma {
     } /* update_array */
 
     /* ######################################## Cube ######################################## */
-    template <typename T> inline py::array_t<T> _cube_to_arr(arma::Cube<T> * src, bool copy) {
+     template <typename T> inline py::array_t<T> _cube_to_arr(arma::Cube<T> * src, bool copy) {
         /* Convert armadillo matrix to numpy array */
         ssize_t tsize =  static_cast<ssize_t>(sizeof(T));
         ssize_t nrows = static_cast<ssize_t>(src->n_rows);
         ssize_t ncols = static_cast<ssize_t>(src->n_cols);
         ssize_t nslices = static_cast<ssize_t>(src->n_slices);
+        // as we are now doing a copy anyway we don't need to bother with stealing the memory
+        T * data = src->memptr();
 
-        T * data = get_data<arma::Cube<T>>(src, copy);
-        py::capsule base = create_capsule(data);
-
-        return py::array_t<T>(
-            {nslices, nrows, ncols}, // shape
-            {tsize * nrows * ncols, tsize, nrows * tsize}, // F-style contiguous strides
-            data, // the data pointer
-            base // numpy array references this parent
+        // second section of template specifies that we want a c_style array and pybind should copy if not
+        return py::array_t<T,  py::array::c_style | py::array::forcecast>(
+            {nrows, ncols, nslices}, // shape
+            {tsize, tsize * ncols, tsize * nrows * ncols},
+            data // the data pointer
         );
     } /* _cube_to_arr */
 
