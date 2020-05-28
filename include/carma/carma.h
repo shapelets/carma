@@ -371,14 +371,14 @@ namespace carma {
         ssize_t nrows = static_cast<ssize_t>(src->n_rows);
         ssize_t ncols = static_cast<ssize_t>(src->n_cols);
 
-        T * data = get_data<arma::Mat<T>>(src, copy);
-        py::capsule base = create_capsule(data);
+        // as we are now doing a copy anyway we don't need to bother with stealing the memory
+        T * data = src->memptr();
 
-        return py::array_t<T>(
-            {nrows, ncols}, // shape
-            {tsize, nrows * tsize}, // F-style contiguous strides
-            data, // the data pointer
-            base // numpy array references this parent
+        // second section of template specifies that we want a c_style array and pybind should copy if not
+        return py::array_t<T,  py::array::c_style | py::array::forcecast>(
+                {nrows, ncols}, // shape
+                {tsize, tsize * ncols},
+                data // the data pointer
         );
     } /* _mat_to_arr */
 
